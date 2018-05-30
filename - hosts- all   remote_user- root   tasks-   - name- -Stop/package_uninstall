@@ -1,0 +1,23 @@
+---
+- hosts: all
+  remote_user: root
+  tasks:
+  - name: "Stop/Disable SCOM Service & Remove SCOM Package"
+    service: name={{item}} state=stopped enabled=no
+    register: command_result
+    with_items:
+      - scx-cimd
+  - apt: name="{{ item }}" state=absent purge=yes
+    with_items:
+     - scx
+    when: ansible_distribution == 'Ubuntu' 
+
+  - yum: name="{{ item }}" state=absent
+    with_items:
+     - scx
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
+
+  - zypper: name="{{ item }}" state=absent
+    with_items:
+     - scx
+    when: ansible_distribution == 'SLES'
